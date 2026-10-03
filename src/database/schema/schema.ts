@@ -27,6 +27,7 @@ export const products = sqliteTable('products', {
   price: real('price').notNull(),
   imageUrl: text('image_url'),
   active: integer('active', { mode: 'boolean' }).notNull().default(true),
+  availableQuantity: integer('available_quantity').notNull().default(0),
   categoryId: integer('category_id')
     .notNull()
     .references(() => categories.id),

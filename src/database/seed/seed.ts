@@ -1,4 +1,5 @@
 import { hash } from 'argon2';
+import { eq } from 'drizzle-orm';
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from '../schema/schema';
 import { categories, products, users } from '../schema/schema';
@@ -18,6 +19,7 @@ const PRODUCTS = [
     description: 'Massa de baunilha com buttercream e granulado.',
     price: 8.5,
     imageUrl: 'https://placehold.co/300x300/fda4af/ffffff?text=Baunilha',
+    availableQuantity: 20,
     categorySlug: 'tradicionais',
   },
   {
@@ -25,6 +27,7 @@ const PRODUCTS = [
     description: 'Massa de chocolate belga com ganache.',
     price: 9.0,
     imageUrl: 'https://placehold.co/300x300/9a3412/ffffff?text=Chocolate',
+    availableQuantity: 15,
     categorySlug: 'tradicionais',
   },
   {
@@ -32,6 +35,7 @@ const PRODUCTS = [
     description: 'Massa vermelha com cream cheese frosting.',
     price: 12.0,
     imageUrl: 'https://placehold.co/300x300/be123c/ffffff?text=Red+Velvet',
+    availableQuantity: 12,
     categorySlug: 'gourmet',
   },
   {
@@ -39,6 +43,7 @@ const PRODUCTS = [
     description: 'Massa de pistache com recheio de framboesa.',
     price: 14.5,
     imageUrl: 'https://placehold.co/300x300/15803d/ffffff?text=Pistache',
+    availableQuantity: 8,
     categorySlug: 'gourmet',
   },
   {
@@ -46,6 +51,7 @@ const PRODUCTS = [
     description: 'Massa vegana de coco com cobertura cremosa.',
     price: 10.0,
     imageUrl: 'https://placehold.co/300x300/0f766e/ffffff?text=Coco',
+    availableQuantity: 10,
     categorySlug: 'veganos',
   },
   {
@@ -53,6 +59,7 @@ const PRODUCTS = [
     description: 'Massa vegana de cacau com ganache de castanha.',
     price: 10.5,
     imageUrl: 'https://placehold.co/300x300/7c2d12/ffffff?text=Cacau',
+    availableQuantity: 0,
     categorySlug: 'veganos',
   },
 ];
@@ -81,21 +88,26 @@ export async function seedDatabase(
     categoryRows.map((row) => [row.slug, row.id]),
   );
 
-  const existingNames = new Set(
+  const existingByName = new Map(
     db
-      .select({ name: products.name })
+      .select()
       .from(products)
       .all()
-      .map((row) => row.name),
+      .map((row) => [row.name, row]),
   );
 
   for (const product of PRODUCTS) {
-    if (existingNames.has(product.name)) {
+    const categoryId = categoryIdBySlug.get(product.categorySlug);
+    if (categoryId === undefined) {
       continue;
     }
 
-    const categoryId = categoryIdBySlug.get(product.categorySlug);
-    if (categoryId === undefined) {
+    const existing = existingByName.get(product.name);
+    if (existing !== undefined) {
+      db.update(products)
+        .set({ availableQuantity: product.availableQuantity })
+        .where(eq(products.id, existing.id))
+        .run();
       continue;
     }
 
@@ -106,6 +118,7 @@ export async function seedDatabase(
         price: product.price,
         imageUrl: product.imageUrl,
         active: true,
+        availableQuantity: product.availableQuantity,
         categoryId,
       })
       .run();
