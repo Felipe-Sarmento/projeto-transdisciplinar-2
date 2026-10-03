@@ -1,0 +1,41 @@
+<section>
+  <h2 class="text-2xl font-semibold text-rose-600">Nossos cupcakes</h2>
+
+  <nav class="mt-4 flex flex-wrap gap-2 text-sm">
+    <a
+      class="rounded-full px-3 py-1 {{#unless selectedCategory}}bg-rose-500 text-white{{else}}border border-rose-200 bg-white text-rose-600{{/unless}}"
+      href="/"
+    >Todas</a>
+    {{#each categories}}
+      <a
+        class="rounded-full px-3 py-1 {{#if (eq ../selectedCategory this.slug)}}bg-rose-500 text-white{{else}}border border-rose-200 bg-white text-rose-600{{/if}}"
+        href="/?categoria={{this.slug}}"
+      >{{this.name}}</a>
+    {{/each}}
+  </nav>
+
+  {{#if products.length}}
+    <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {{#each products}}
+        <a
+          class="block rounded-lg bg-white shadow-sm transition hover:shadow-md {{#if (eq this.availableQuantity 0)}}opacity-60{{/if}}"
+          href="/produtos/{{this.id}}"
+        >
+          <img class="h-40 w-full rounded-t-lg object-cover" src="{{this.imageUrl}}" alt="{{this.name}}" />
+          <div class="p-4">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-semibold">{{this.name}}</h3>
+              {{#if (eq this.availableQuantity 0)}}
+                <span class="rounded bg-stone-200 px-2 py-0.5 text-xs text-stone-600">Esgotado</span>
+              {{/if}}
+            </div>
+            <p class="mt-1 text-sm text-stone-500">{{this.categoryName}}</p>
+            <p class="mt-2 font-bold text-rose-600">R$ {{this.price}}</p>
+          </div>
+        </a>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="mt-8 text-stone-500">Nenhum cupcake nesta categoria.</p>
+  {{/if}}
+</section>

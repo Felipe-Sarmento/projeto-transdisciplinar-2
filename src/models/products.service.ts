@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { DatabaseService } from '../database/database.service';
 import { categories, products } from '../database/schema/schema';
 
@@ -55,6 +55,32 @@ export class ProductsService {
       .select()
       .from(products)
       .where(eq(products.id, id))
+      .all();
+
+    return rows[0];
+  }
+
+  findActive(categorySlug?: string): ProductWithCategory[] {
+    const condition =
+      categorySlug === undefined || categorySlug === ''
+        ? eq(products.active, true)
+        : and(eq(products.active, true), eq(categories.slug, categorySlug));
+
+    return this.database.db
+      .select(withCategorySelection)
+      .from(products)
+      .innerJoin(categories, eq(products.categoryId, categories.id))
+      .where(condition)
+      .orderBy(products.name)
+      .all();
+  }
+
+  findActiveById(id: number): ProductWithCategory | undefined {
+    const rows = this.database.db
+      .select(withCategorySelection)
+      .from(products)
+      .innerJoin(categories, eq(products.categoryId, categories.id))
+      .where(and(eq(products.id, id), eq(products.active, true)))
       .all();
 
     return rows[0];
