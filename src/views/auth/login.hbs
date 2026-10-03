@@ -1,0 +1,39 @@
+<section class="mx-auto max-w-sm rounded-lg bg-white p-8 shadow-sm">
+  <h2 class="text-2xl font-semibold text-rose-600">Entrar</h2>
+
+  {{#if error}}
+    <p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{error}}</p>
+  {{/if}}
+
+  <form method="post" action="/login" class="mt-6 space-y-4">
+    <div>
+      <label class="block text-sm font-medium" for="email">E-mail</label>
+      <input
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        type="email"
+        id="email"
+        name="email"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium" for="password">Senha</label>
+      <input
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        type="password"
+        id="password"
+        name="password"
+        minlength="8"
+        required
+      />
+    </div>
+
+    <button
+      class="w-full rounded bg-rose-500 px-4 py-2 font-semibold text-white"
+      type="submit"
+    >
+      Entrar
+    </button>
+  </form>
+</section>

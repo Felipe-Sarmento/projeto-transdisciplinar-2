@@ -1,9 +1,15 @@
 import { join } from 'node:path';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import cookieParser from 'cookie-parser';
 import { engine } from 'express-handlebars';
+import { AuthRedirectFilter } from './common/filters/auth-redirect.filter';
 
 export function configureApp(app: NestExpressApplication): void {
+  app.use(cookieParser());
+
+  app.useGlobalFilters(new AuthRedirectFilter());
+
   app.engine(
     'hbs',
     engine({
