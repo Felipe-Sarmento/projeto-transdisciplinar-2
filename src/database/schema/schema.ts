@@ -35,9 +35,8 @@ export const products = sqliteTable('products', {
 
 export const orders = sqliteTable('orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: integer('user_id')
-    .notNull()
-    .references(() => users.id),
+  userId: integer('user_id').references(() => users.id),
+  customerName: text('customer_name').notNull(),
   status: text('status', {
     enum: ['PENDENTE', 'CONFIRMADO', 'EM_PREPARO', 'ENTREGUE', 'CANCELADO'],
   })

@@ -18,8 +18,9 @@ export function configureApp(app: NestExpressApplication): void {
   });
 
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const token = (req.cookies as Record<string, unknown> | undefined)
-      ?.access_token;
+    const cookies = req.cookies as Record<string, unknown> | undefined;
+
+    const token = cookies?.access_token;
     if (typeof token === 'string') {
       try {
         res.locals.currentUser =
@@ -28,6 +29,15 @@ export function configureApp(app: NestExpressApplication): void {
         // token inválido/expirado: header mostra estado deslogado
       }
     }
+
+    const cart = cookies?.cart;
+    if (Array.isArray(cart)) {
+      res.locals.cartCount = cart.reduce<number>((sum, entry) => {
+        const quantity = Number((entry as { quantity?: unknown }).quantity);
+        return sum + (Number.isFinite(quantity) ? quantity : 0);
+      }, 0);
+    }
+
     next();
   });
 

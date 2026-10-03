@@ -8,6 +8,13 @@
     <nav class="flex items-center gap-2" aria-label="Principal">
       <a class="nav-link" href="/">Catálogo</a>
 
+      <a class="nav-link relative" href="/carrinho" aria-label="Carrinho de compras">
+        <span aria-hidden="true">🛒</span>
+        {{#if cartCount}}
+          <span class="absolute -right-1 -top-1 rounded-full bg-rose-600 px-1.5 text-[10px] font-bold leading-4 text-white">{{cartCount}}</span>
+        {{/if}}
+      </a>
+
       {{#if currentUser}}
         {{#if (eq currentUser.role 'ADMIN')}}
           <a class="nav-link" href="/admin">Painel</a>

@@ -5,11 +5,15 @@ import { JwtStrategy } from './common/strategies/jwt.strategy';
 import { AdminCategoriesController } from './controllers/admin-categories.controller';
 import { AdminProductsController } from './controllers/admin-products.controller';
 import { CatalogController } from './controllers/catalog.controller';
+import { CartController } from './controllers/cart.controller';
+import { OrderController } from './controllers/order.controller';
 import { AdminController } from './controllers/admin.controller';
 import { AuthController } from './controllers/auth.controller';
 import { DatabaseService } from './database/database.service';
 import { AuthService } from './models/auth.service';
+import { CartService } from './models/cart.service';
 import { CategoriesService } from './models/categories.service';
+import { OrdersService } from './models/orders.service';
 import { ProductsService } from './models/products.service';
 
 @Module({
@@ -22,6 +26,8 @@ import { ProductsService } from './models/products.service';
   ],
   controllers: [
     CatalogController,
+    CartController,
+    OrderController,
     AuthController,
     AdminController,
     AdminProductsController,
@@ -33,6 +39,8 @@ import { ProductsService } from './models/products.service';
     JwtStrategy,
     ProductsService,
     CategoriesService,
+    CartService,
+    OrdersService,
   ],
 })
 export class AppModule {}

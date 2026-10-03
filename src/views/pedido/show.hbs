@@ -1,0 +1,33 @@
+<section class="mx-auto max-w-2xl">
+  <div class="card p-8">
+    <div class="flex items-center gap-3">
+      <span class="text-3xl" aria-hidden="true">✅</span>
+      <div>
+        <h1 class="text-2xl font-extrabold text-stone-800">Pedido confirmado!</h1>
+        <p class="text-stone-500">Pedido #{{order.id}} · {{order.status}}</p>
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-2 text-sm text-stone-600 sm:grid-cols-2">
+      <p><span class="font-semibold text-stone-700">Nome:</span> {{order.customerName}}</p>
+      <p><span class="font-semibold text-stone-700">Endereço:</span> {{order.deliveryAddress}}</p>
+    </div>
+
+    <h2 class="mt-6 font-bold text-stone-800">Itens</h2>
+    <ul class="mt-2 divide-y divide-stone-100">
+      {{#each order.lines}}
+        <li class="flex justify-between py-2 text-sm">
+          <span>{{this.quantity}}x {{this.name}}</span>
+          <span class="font-semibold">R$ {{this.lineTotal}}</span>
+        </li>
+      {{/each}}
+    </ul>
+
+    <div class="mt-4 flex justify-between border-t border-stone-200 pt-3 text-lg font-extrabold text-stone-800">
+      <span>Total</span>
+      <span>R$ {{order.total}}</span>
+    </div>
+
+    <a class="btn btn-primary mt-6" href="/">Voltar ao catálogo</a>
+  </div>
+</section>
