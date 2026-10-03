@@ -50,6 +50,39 @@ export function configureApp(app: NestExpressApplication): void {
       partialsDir: join(__dirname, 'views', 'partials'),
       helpers: {
         eq: (a: unknown, b: unknown): boolean => a === b,
+        date: (value: unknown): string => {
+          if (value instanceof Date) {
+            return value.toLocaleDateString('pt-BR');
+          }
+          if (typeof value === 'string' || typeof value === 'number') {
+            return String(value);
+          }
+          return '';
+        },
+        statusClass: (status: unknown): string => {
+          switch (status) {
+            case 'PENDENTE':
+              return 'bg-amber-100 text-amber-700';
+            case 'PAGAMENTO_REALIZADO':
+              return 'bg-green-100 text-green-700';
+            case 'CANCELADO':
+              return 'bg-red-100 text-red-700';
+            default:
+              return 'bg-stone-200 text-stone-600';
+          }
+        },
+        statusLabel: (status: unknown): string => {
+          switch (status) {
+            case 'PENDENTE':
+              return 'Aguardando pagamento';
+            case 'PAGAMENTO_REALIZADO':
+              return 'Pagamento realizado';
+            case 'CANCELADO':
+              return 'Cancelado';
+            default:
+              return typeof status === 'string' ? status : '';
+          }
+        },
       },
     }),
   );

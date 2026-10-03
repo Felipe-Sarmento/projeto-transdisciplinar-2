@@ -115,6 +115,15 @@ describe('Checkout (e2e)', () => {
     expect(items).toHaveLength(1);
     expect(items[0].unitPrice).toBe(product.price);
 
+    // baixa de estoque
+    const after = database.db
+      .select()
+      .from(products)
+      .where(eq(products.id, product.id))
+      .all()
+      .at(0);
+    expect(after?.availableQuantity).toBe(product.availableQuantity - 1);
+
     // carrinho limpo: cookie passa a vazio
     const clearedCookie = setCookie(confirm) ?? cookie;
     const cart = await request(app.getHttpServer())
@@ -124,7 +133,7 @@ describe('Checkout (e2e)', () => {
     expect(cart.text).toContain('carrinho está vazio');
   });
 
-  it('mostra a confirmação do pedido', async () => {
+  it('mostra a tela de pagamento via PIX (não pago)', async () => {
     const orderId = createdOrderIds[0];
     if (orderId === undefined) throw new Error('pedido ausente');
 
@@ -132,9 +141,27 @@ describe('Checkout (e2e)', () => {
       .get(`/pedido/${orderId}`)
       .expect(200);
 
-    expect(response.text).toContain('Pedido confirmado');
+    expect(response.text).toContain('pagamento via PIX');
     expect(response.text).toContain('Fulano de Tal');
     expect(response.text).toContain('Rua A, 123');
+  });
+
+  it('mostra o comprovante quando o pagamento é confirmado', async () => {
+    const orderId = createdOrderIds[0];
+    if (orderId === undefined) throw new Error('pedido ausente');
+
+    database.db
+      .update(orders)
+      .set({ status: 'PAGAMENTO_REALIZADO' })
+      .where(eq(orders.id, orderId))
+      .run();
+
+    const response = await request(app.getHttpServer())
+      .get(`/pedido/${orderId}`)
+      .expect(200);
+
+    expect(response.text).toContain('Pagamento confirmado');
+    expect(response.text).toContain('Fulano de Tal');
   });
 
   it('responde 404 para pedido inexistente', () => {

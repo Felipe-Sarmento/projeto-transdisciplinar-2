@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './common/strategies/jwt.strategy';
 import { AdminCategoriesController } from './controllers/admin-categories.controller';
+import { AdminOrdersController } from './controllers/admin-orders.controller';
 import { AdminProductsController } from './controllers/admin-products.controller';
 import { CatalogController } from './controllers/catalog.controller';
 import { CartController } from './controllers/cart.controller';
@@ -32,6 +33,7 @@ import { ProductsService } from './models/products.service';
     AdminController,
     AdminProductsController,
     AdminCategoriesController,
+    AdminOrdersController,
   ],
   providers: [
     DatabaseService,

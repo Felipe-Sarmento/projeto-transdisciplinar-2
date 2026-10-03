@@ -38,7 +38,7 @@ export const orders = sqliteTable('orders', {
   userId: integer('user_id').references(() => users.id),
   customerName: text('customer_name').notNull(),
   status: text('status', {
-    enum: ['PENDENTE', 'CONFIRMADO', 'EM_PREPARO', 'ENTREGUE', 'CANCELADO'],
+    enum: ['PENDENTE', 'PAGAMENTO_REALIZADO', 'CANCELADO'],
   })
     .notNull()
     .default('PENDENTE'),

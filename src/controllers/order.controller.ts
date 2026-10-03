@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { CartService } from '../models/cart.service';
-import { OrdersService } from '../models/orders.service';
+import { OrdersService, isPaidStatus } from '../models/orders.service';
 
 @Controller()
 export class OrderController {
@@ -47,13 +47,17 @@ export class OrderController {
     const orderId = this.ordersService.create({
       customerName: name,
       deliveryAddress: address,
-      total: view.subtotal,
       items: view.lines.map((line) => ({
         productId: line.productId,
         quantity: line.quantity,
         unitPrice: line.unitPrice,
       })),
     });
+
+    if (orderId === null) {
+      response.redirect('/carrinho?erro=Itens+indisponiveis+no+momento');
+      return;
+    }
 
     response.clearCookie('cart');
     response.redirect(`/pedido/${orderId}`);
@@ -68,6 +72,11 @@ export class OrderController {
       throw new NotFoundException('Pedido não encontrado');
     }
 
-    return { title: `Pedido #${order.id}`, order };
+    return {
+      title: `Pedido #${order.id}`,
+      order,
+      paid: isPaidStatus(order.status),
+      cancelled: order.status === 'CANCELADO',
+    };
   }
 }

@@ -1,33 +1,80 @@
 <section class="mx-auto max-w-2xl">
-  <div class="card p-8">
-    <div class="flex items-center gap-3">
-      <span class="text-3xl" aria-hidden="true">✅</span>
-      <div>
-        <h1 class="text-2xl font-extrabold text-stone-800">Pedido confirmado!</h1>
-        <p class="text-stone-500">Pedido #{{order.id}} · {{order.status}}</p>
+  {{#if cancelled}}
+    <div class="card p-8 text-center">
+      <span class="text-4xl" aria-hidden="true">🚫</span>
+      <h1 class="mt-2 text-2xl font-extrabold text-stone-800">Pedido cancelado</h1>
+      <p class="mt-1 text-stone-500">Pedido #{{order.id}} · {{statusLabel order.status}}</p>
+      <p class="mx-auto mt-4 max-w-md text-sm text-stone-600">
+        Este pedido foi cancelado e não será preparado. Se você já efetuou o pagamento, entre em
+        contato com a loja.
+      </p>
+      <a class="btn btn-primary mt-6" href="/">Voltar ao catálogo</a>
+    </div>
+  {{else}}
+    {{#if paid}}
+      <div class="card p-8">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl" aria-hidden="true">✅</span>
+          <div>
+            <h1 class="text-2xl font-extrabold text-stone-800">Pagamento confirmado!</h1>
+            <p class="text-stone-500">Pedido #{{order.id}} · {{statusLabel order.status}}</p>
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-2 text-sm text-stone-600 sm:grid-cols-2">
+          <p><span class="font-semibold text-stone-700">Nome:</span> {{order.customerName}}</p>
+          <p><span class="font-semibold text-stone-700">Endereço:</span> {{order.deliveryAddress}}</p>
+        </div>
+
+        <h2 class="mt-6 font-bold text-stone-800">Itens</h2>
+        <ul class="mt-2 divide-y divide-stone-100">
+          {{#each order.lines}}
+            <li class="flex justify-between py-2 text-sm">
+              <span>{{this.quantity}}x {{this.name}}</span>
+              <span class="font-semibold">R$ {{this.lineTotal}}</span>
+            </li>
+          {{/each}}
+        </ul>
+
+        <div class="mt-4 flex justify-between border-t border-stone-200 pt-3 text-lg font-extrabold text-stone-800">
+          <span>Total</span>
+          <span>R$ {{order.total}}</span>
+        </div>
+
+        <a class="btn btn-primary mt-6" href="/">Voltar ao catálogo</a>
       </div>
-    </div>
+    {{else}}
+      <div class="card p-8">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl" aria-hidden="true">⏳</span>
+          <div>
+            <h1 class="text-2xl font-extrabold text-stone-800">Faça o pagamento via PIX</h1>
+            <p class="text-stone-500">Pedido #{{order.id}} · {{statusLabel order.status}}</p>
+          </div>
+        </div>
 
-    <div class="mt-6 grid gap-2 text-sm text-stone-600 sm:grid-cols-2">
-      <p><span class="font-semibold text-stone-700">Nome:</span> {{order.customerName}}</p>
-      <p><span class="font-semibold text-stone-700">Endereço:</span> {{order.deliveryAddress}}</p>
-    </div>
+        <div class="mt-6 grid gap-2 text-sm text-stone-600 sm:grid-cols-2">
+          <p><span class="font-semibold text-stone-700">Nome:</span> {{order.customerName}}</p>
+          <p><span class="font-semibold text-stone-700">Endereço:</span> {{order.deliveryAddress}}</p>
+        </div>
 
-    <h2 class="mt-6 font-bold text-stone-800">Itens</h2>
-    <ul class="mt-2 divide-y divide-stone-100">
-      {{#each order.lines}}
-        <li class="flex justify-between py-2 text-sm">
-          <span>{{this.quantity}}x {{this.name}}</span>
-          <span class="font-semibold">R$ {{this.lineTotal}}</span>
-        </li>
-      {{/each}}
-    </ul>
+        <div class="mt-6 rounded-xl bg-amber-50 p-6 text-center ring-1 ring-amber-200">
+          <span class="text-3xl" aria-hidden="true">📱</span>
+          <p class="mt-2 text-lg font-extrabold text-amber-800">Pague com PIX</p>
+          <p class="mx-auto mt-2 max-w-md text-sm text-amber-900/80">
+            Abra o aplicativo do seu banco, escolha pagar com PIX e efetue o pagamento. Assim que o
+            valor for identificado, a loja confirmará o seu pedido.
+          </p>
+          <p class="mt-4 text-sm font-semibold text-amber-800">Valor a pagar</p>
+          <p class="mt-1 text-3xl font-extrabold text-amber-900">R$ {{order.total}}</p>
+        </div>
 
-    <div class="mt-4 flex justify-between border-t border-stone-200 pt-3 text-lg font-extrabold text-stone-800">
-      <span>Total</span>
-      <span>R$ {{order.total}}</span>
-    </div>
+        <p class="mt-4 text-sm text-stone-500">
+          Após o pagamento, a loja confirmará seu pedido. Atualize esta página para acompanhar o status.
+        </p>
 
-    <a class="btn btn-primary mt-6" href="/">Voltar ao catálogo</a>
-  </div>
+        <a class="btn btn-primary mt-6" href="/">Voltar ao catálogo</a>
+      </div>
+    {{/if}}
+  {{/if}}
 </section>

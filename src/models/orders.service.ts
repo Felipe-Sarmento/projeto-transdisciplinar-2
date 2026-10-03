@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 import { DatabaseService } from '../database/database.service';
 import { orderItems, orders, products } from '../database/schema/schema';
 
@@ -12,7 +12,6 @@ export interface OrderItemInput {
 export interface OrderInput {
   customerName: string;
   deliveryAddress: string;
-  total: number;
   items: OrderItemInput[];
 }
 
@@ -34,25 +33,86 @@ export interface OrderDetail {
   lines: OrderLine[];
 }
 
+export const ORDER_STATUSES = [
+  'PENDENTE',
+  'PAGAMENTO_REALIZADO',
+  'CANCELADO',
+] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export const PAID_STATUSES = ['PAGAMENTO_REALIZADO'] as const;
+
+export function isPaidStatus(status: string): boolean {
+  return (PAID_STATUSES as readonly string[]).includes(status);
+}
+
+export interface OrderSummary {
+  id: number;
+  customerName: string;
+  status: string;
+  total: number;
+  deliveryAddress: string;
+  createdAt: Date;
+  itemsCount: number;
+}
+
 @Injectable()
 export class OrdersService {
   constructor(private readonly database: DatabaseService) {}
 
-  create(input: OrderInput): number {
+  create(input: OrderInput): number | null {
     return this.database.db.transaction((tx) => {
+      let total = 0;
+      const prepared: OrderItemInput[] = [];
+
+      for (const item of input.items) {
+        const product = tx
+          .select()
+          .from(products)
+          .where(eq(products.id, item.productId))
+          .all()
+          .at(0);
+
+        if (product === undefined || !product.active) {
+          continue;
+        }
+
+        const quantity = Math.min(item.quantity, product.availableQuantity);
+        if (quantity <= 0) {
+          continue;
+        }
+
+        prepared.push({
+          productId: item.productId,
+          quantity,
+          unitPrice: item.unitPrice,
+        });
+        total += item.unitPrice * quantity;
+
+        tx.update(products)
+          .set({ availableQuantity: product.availableQuantity - quantity })
+          .where(eq(products.id, item.productId))
+          .run();
+      }
+
+      if (prepared.length === 0) {
+        return null;
+      }
+
       const result = tx
         .insert(orders)
         .values({
           customerName: input.customerName,
           deliveryAddress: input.deliveryAddress,
-          total: input.total,
+          total: Math.round(total * 100) / 100,
           status: 'PENDENTE',
         })
         .run();
 
       const orderId = Number(result.lastInsertRowid);
 
-      for (const item of input.items) {
+      for (const item of prepared) {
         tx.insert(orderItems)
           .values({
             orderId,
@@ -105,5 +165,31 @@ export class OrdersService {
       createdAt: order.createdAt,
       lines,
     };
+  }
+
+  findAll(): OrderSummary[] {
+    return this.database.db
+      .select({
+        id: orders.id,
+        customerName: orders.customerName,
+        status: orders.status,
+        total: orders.total,
+        deliveryAddress: orders.deliveryAddress,
+        createdAt: orders.createdAt,
+        itemsCount: count(orderItems.id),
+      })
+      .from(orders)
+      .leftJoin(orderItems, eq(orderItems.orderId, orders.id))
+      .groupBy(orders.id)
+      .orderBy(desc(orders.createdAt))
+      .all();
+  }
+
+  updateStatus(id: number, status: OrderStatus): void {
+    this.database.db
+      .update(orders)
+      .set({ status })
+      .where(eq(orders.id, id))
+      .run();
   }
 }

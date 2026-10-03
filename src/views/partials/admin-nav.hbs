@@ -14,4 +14,9 @@
     href="/admin/categorias"
     {{#if (eq adminSection 'categorias')}}aria-current="page"{{/if}}
   >Categorias</a>
+  <a
+    class="rounded-t-md px-4 py-2 text-sm font-semibold transition {{#if (eq adminSection 'pedidos')}}border-b-2 border-rose-600 text-rose-600{{else}}text-stone-500 hover:text-rose-600{{/if}}"
+    href="/admin/pedidos"
+    {{#if (eq adminSection 'pedidos')}}aria-current="page"{{/if}}
+  >Pedidos</a>
 </nav>
