@@ -1,0 +1,17 @@
+<nav class="mb-6 flex flex-wrap gap-1 border-b border-stone-200" aria-label="Administração">
+  <a
+    class="rounded-t-md px-4 py-2 text-sm font-semibold transition {{#if (eq adminSection 'dashboard')}}border-b-2 border-rose-600 text-rose-600{{else}}text-stone-500 hover:text-rose-600{{/if}}"
+    href="/admin"
+    {{#if (eq adminSection 'dashboard')}}aria-current="page"{{/if}}
+  >Dashboard</a>
+  <a
+    class="rounded-t-md px-4 py-2 text-sm font-semibold transition {{#if (eq adminSection 'produtos')}}border-b-2 border-rose-600 text-rose-600{{else}}text-stone-500 hover:text-rose-600{{/if}}"
+    href="/admin/produtos"
+    {{#if (eq adminSection 'produtos')}}aria-current="page"{{/if}}
+  >Produtos</a>
+  <a
+    class="rounded-t-md px-4 py-2 text-sm font-semibold transition {{#if (eq adminSection 'categorias')}}border-b-2 border-rose-600 text-rose-600{{else}}text-stone-500 hover:text-rose-600{{/if}}"
+    href="/admin/categorias"
+    {{#if (eq adminSection 'categorias')}}aria-current="page"{{/if}}
+  >Categorias</a>
+</nav>

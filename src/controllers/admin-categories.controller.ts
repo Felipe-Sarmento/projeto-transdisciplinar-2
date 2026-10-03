@@ -29,6 +29,7 @@ export class AdminCategoriesController {
     return {
       title: 'Categorias',
       categories: this.categoriesService.findAll(),
+      adminSection: 'categorias',
       ok,
       erro,
     };

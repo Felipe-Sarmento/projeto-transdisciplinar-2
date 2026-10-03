@@ -1,9 +1,25 @@
-<section class="rounded-lg bg-white p-8 shadow-sm">
-  <h2 class="text-2xl font-semibold text-rose-600">Painel administrativo</h2>
-  <p class="mt-2 text-stone-600">Bem-vindo, {{currentUser.name}}.</p>
+<section>
+  {{> admin-nav}}
 
-  <nav class="mt-6 flex gap-6">
-    <a class="font-medium text-rose-600 underline" href="/admin/produtos">Produtos</a>
-    <a class="font-medium text-rose-600 underline" href="/admin/categorias">Categorias</a>
-  </nav>
+  <div class="card p-8">
+    <h1 class="text-2xl font-extrabold text-stone-800">Painel administrativo</h1>
+    <p class="mt-1 text-stone-600">Bem-vindo, {{currentUser.name}}.</p>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      <a class="card flex items-center justify-between p-6 transition hover:-translate-y-0.5 hover:shadow-md" href="/admin/produtos">
+        <div>
+          <p class="font-bold text-stone-800">Produtos</p>
+          <p class="text-sm text-stone-500">Criar, editar, ativar/desativar e estoque</p>
+        </div>
+        <span class="text-2xl" aria-hidden="true">📦</span>
+      </a>
+      <a class="card flex items-center justify-between p-6 transition hover:-translate-y-0.5 hover:shadow-md" href="/admin/categorias">
+        <div>
+          <p class="font-bold text-stone-800">Categorias</p>
+          <p class="text-sm text-stone-500">Organizar o catálogo</p>
+        </div>
+        <span class="text-2xl" aria-hidden="true">🏷️</span>
+      </a>
+    </div>
+  </div>
 </section>

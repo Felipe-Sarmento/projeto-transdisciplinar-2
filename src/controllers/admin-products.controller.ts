@@ -33,6 +33,7 @@ export class AdminProductsController {
     return {
       title: 'Produtos',
       products: this.productsService.findAllWithCategory(),
+      adminSection: 'produtos',
       ok,
       erro,
     };
@@ -46,6 +47,7 @@ export class AdminProductsController {
       product: null,
       categories: this.categoriesService.findAll(),
       action: '/admin/produtos',
+      adminSection: 'produtos',
     };
   }
 
@@ -63,6 +65,7 @@ export class AdminProductsController {
       product: this.productsService.findById(id),
       categories: this.categoriesService.findAll(),
       action: `/admin/produtos/${id}`,
+      adminSection: 'produtos',
     };
   }
 

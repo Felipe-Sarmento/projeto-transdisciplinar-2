@@ -6,11 +6,12 @@ import cookieParser from 'cookie-parser';
 import type { NextFunction, Request, Response } from 'express';
 import { engine } from 'express-handlebars';
 import { AuthRedirectFilter } from './common/filters/auth-redirect.filter';
+import { NotFoundFilter } from './common/filters/not-found.filter';
 
 export function configureApp(app: NestExpressApplication): void {
   app.use(cookieParser());
 
-  app.useGlobalFilters(new AuthRedirectFilter());
+  app.useGlobalFilters(new AuthRedirectFilter(), new NotFoundFilter());
 
   const jwtService = new JwtService({
     secret: process.env.JWT_SECRET ?? 'dev-secret-change-me',

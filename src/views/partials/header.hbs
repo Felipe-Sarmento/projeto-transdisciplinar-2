@@ -1,15 +1,23 @@
-<header class="bg-rose-500 text-white shadow">
-  <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-    <a class="text-xl font-bold" href="/">Cupcake Gourmet</a>
+<header class="sticky top-0 z-40 border-b border-rose-100 bg-white/85 backdrop-blur">
+  <div class="container-page flex items-center justify-between gap-4 py-3">
+    <a class="flex items-center gap-2 text-lg font-extrabold tracking-tight text-rose-600" href="/">
+      <span aria-hidden="true">🧁</span>
+      <span>Cupcake Gourmet</span>
+    </a>
 
-    <nav class="text-sm">
+    <nav class="flex items-center gap-2" aria-label="Principal">
+      <a class="nav-link" href="/">Catálogo</a>
+
       {{#if currentUser}}
-        <span class="font-medium">{{currentUser.name}}</span>
-        <form method="post" action="/logout" class="ml-3 inline">
-          <button type="submit" class="underline">Sair</button>
+        {{#if (eq currentUser.role 'ADMIN')}}
+          <a class="nav-link" href="/admin">Painel</a>
+        {{/if}}
+        <span class="hidden text-sm text-stone-500 sm:inline">{{currentUser.name}}</span>
+        <form method="post" action="/logout">
+          <button class="btn btn-secondary" type="submit">Sair</button>
         </form>
       {{else}}
-        <a class="underline" href="/login">Entrar</a>
+        <a class="btn btn-primary" href="/login">Entrar</a>
       {{/if}}
     </nav>
   </div>

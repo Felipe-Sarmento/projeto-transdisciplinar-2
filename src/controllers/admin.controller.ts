@@ -9,7 +9,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 export class AdminController {
   @Get()
   @Render('admin/home')
-  getHome(): { title: string } {
-    return { title: 'Painel' };
+  getHome(): { title: string; adminSection: string } {
+    return { title: 'Painel', adminSection: 'dashboard' };
   }
 }

@@ -30,7 +30,7 @@ describe('Catálogo (e2e)', () => {
   it('lista os cupcakes ativos', async () => {
     const response = await request(app.getHttpServer()).get('/').expect(200);
 
-    expect(response.text).toContain('Nossos cupcakes');
+    expect(response.text).toContain('Cupcakes artesanais gourmet');
     expect(response.text).toContain('Baunilha Clássico');
   });
 

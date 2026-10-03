@@ -1,39 +1,43 @@
-<section class="mx-auto max-w-sm rounded-lg bg-white p-8 shadow-sm">
-  <h2 class="text-2xl font-semibold text-rose-600">Entrar</h2>
-
-  {{#if error}}
-    <p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{error}}</p>
-  {{/if}}
-
-  <form method="post" action="/login" class="mt-6 space-y-4">
-    <div>
-      <label class="block text-sm font-medium" for="email">E-mail</label>
-      <input
-        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
-        type="email"
-        id="email"
-        name="email"
-        required
-      />
+<section class="mx-auto max-w-sm">
+  <div class="card p-8">
+    <div class="flex flex-col items-center text-center">
+      <span class="text-4xl" aria-hidden="true">🧁</span>
+      <h1 class="mt-2 text-2xl font-extrabold text-stone-800">Entrar</h1>
+      <p class="mt-1 text-sm text-stone-500">Acesso restrito à administração.</p>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium" for="password">Senha</label>
-      <input
-        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
-        type="password"
-        id="password"
-        name="password"
-        minlength="8"
-        required
-      />
-    </div>
+    {{#if error}}
+      <p class="alert alert-error mt-6" role="alert">{{error}}</p>
+    {{/if}}
 
-    <button
-      class="w-full rounded bg-rose-500 px-4 py-2 font-semibold text-white"
-      type="submit"
-    >
-      Entrar
-    </button>
-  </form>
+    <form method="post" action="/login" class="mt-6 space-y-4">
+      <div>
+        <label class="field-label" for="email">E-mail</label>
+        <input
+          class="input mt-1"
+          type="email"
+          id="email"
+          name="email"
+          autocomplete="email"
+          autofocus
+          required
+        />
+      </div>
+
+      <div>
+        <label class="field-label" for="password">Senha</label>
+        <input
+          class="input mt-1"
+          type="password"
+          id="password"
+          name="password"
+          autocomplete="current-password"
+          minlength="8"
+          required
+        />
+      </div>
+
+      <button class="btn btn-primary w-full" type="submit">Entrar</button>
+    </form>
+  </div>
 </section>

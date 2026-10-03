@@ -1,15 +1,22 @@
 <section>
-  <h2 class="text-2xl font-semibold text-rose-600">Nossos cupcakes</h2>
+  <div class="rounded-2xl bg-gradient-to-br from-rose-500 to-rose-600 px-6 py-10 text-white shadow-sm sm:px-10">
+    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Cupcakes artesanais gourmet</h1>
+    <p class="mt-2 max-w-xl text-rose-50">
+      Escolha entre sabores tradicionais, gourmet e veganos — feitos fresquinhos todos os dias.
+    </p>
+  </div>
 
-  <nav class="mt-4 flex flex-wrap gap-2 text-sm">
+  <nav class="mt-6 flex flex-wrap gap-2" aria-label="Filtrar por categoria">
     <a
-      class="rounded-full px-3 py-1 {{#unless selectedCategory}}bg-rose-500 text-white{{else}}border border-rose-200 bg-white text-rose-600{{/unless}}"
+      class="rounded-full px-4 py-1.5 text-sm font-semibold transition {{#unless selectedCategory}}bg-rose-600 text-white shadow-sm{{else}}border border-rose-200 bg-white text-rose-600 hover:bg-rose-50{{/unless}}"
       href="/"
+      {{#unless selectedCategory}}aria-current="page"{{/unless}}
     >Todas</a>
     {{#each categories}}
       <a
-        class="rounded-full px-3 py-1 {{#if (eq ../selectedCategory this.slug)}}bg-rose-500 text-white{{else}}border border-rose-200 bg-white text-rose-600{{/if}}"
+        class="rounded-full px-4 py-1.5 text-sm font-semibold transition {{#if (eq ../selectedCategory this.slug)}}bg-rose-600 text-white shadow-sm{{else}}border border-rose-200 bg-white text-rose-600 hover:bg-rose-50{{/if}}"
         href="/?categoria={{this.slug}}"
+        {{#if (eq ../selectedCategory this.slug)}}aria-current="page"{{/if}}
       >{{this.name}}</a>
     {{/each}}
   </nav>
@@ -18,24 +25,34 @@
     <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {{#each products}}
         <a
-          class="block rounded-lg bg-white shadow-sm transition hover:shadow-md {{#if (eq this.availableQuantity 0)}}opacity-60{{/if}}"
+          class="group card overflow-hidden transition hover:-translate-y-1 hover:shadow-md {{#if (eq this.availableQuantity 0)}}opacity-75{{/if}}"
           href="/produtos/{{this.id}}"
         >
-          <img class="h-40 w-full rounded-t-lg object-cover" src="{{this.imageUrl}}" alt="{{this.name}}" />
+          <div class="relative aspect-[4/3] overflow-hidden bg-stone-100">
+            <img
+              class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+              src="{{this.imageUrl}}"
+              alt="{{this.name}}"
+              loading="lazy"
+            />
+            {{#if (eq this.availableQuantity 0)}}
+              <span class="badge badge-out absolute right-3 top-3">Esgotado</span>
+            {{/if}}
+          </div>
           <div class="p-4">
-            <div class="flex items-center justify-between gap-2">
-              <h3 class="font-semibold">{{this.name}}</h3>
-              {{#if (eq this.availableQuantity 0)}}
-                <span class="rounded bg-stone-200 px-2 py-0.5 text-xs text-stone-600">Esgotado</span>
-              {{/if}}
-            </div>
-            <p class="mt-1 text-sm text-stone-500">{{this.categoryName}}</p>
-            <p class="mt-2 font-bold text-rose-600">R$ {{this.price}}</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">{{this.categoryName}}</p>
+            <h2 class="mt-1 font-bold text-stone-800">{{this.name}}</h2>
+            <p class="mt-2 text-lg font-extrabold text-rose-600">R$ {{this.price}}</p>
           </div>
         </a>
       {{/each}}
     </div>
   {{else}}
-    <p class="mt-8 text-stone-500">Nenhum cupcake nesta categoria.</p>
+    <div class="card mt-6 flex flex-col items-center gap-2 px-6 py-16 text-center">
+      <span class="text-4xl" aria-hidden="true">🧁</span>
+      <p class="font-semibold text-stone-700">Nenhum cupcake nesta categoria</p>
+      <p class="text-sm text-stone-500">Tente outra categoria ou veja todos os cupcakes.</p>
+      <a class="btn btn-primary mt-2" href="/">Ver todos</a>
+    </div>
   {{/if}}
 </section>
