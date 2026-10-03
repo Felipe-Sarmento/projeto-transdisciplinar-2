@@ -192,4 +192,49 @@ export class OrdersService {
       .where(eq(orders.id, id))
       .run();
   }
+
+  cancel(id: number): boolean {
+    return this.database.db.transaction((tx) => {
+      const order = tx
+        .select()
+        .from(orders)
+        .where(eq(orders.id, id))
+        .all()
+        .at(0);
+
+      if (order === undefined || order.status === 'CANCELADO') {
+        return false;
+      }
+
+      const items = tx
+        .select()
+        .from(orderItems)
+        .where(eq(orderItems.orderId, id))
+        .all();
+
+      for (const item of items) {
+        const product = tx
+          .select()
+          .from(products)
+          .where(eq(products.id, item.productId))
+          .all()
+          .at(0);
+
+        if (product === undefined) {
+          continue;
+        }
+
+        tx.update(products)
+          .set({ availableQuantity: product.availableQuantity + item.quantity })
+          .where(eq(products.id, item.productId))
+          .run();
+      }
+
+      tx.update(orders)
+        .set({ status: 'CANCELADO' })
+        .where(eq(orders.id, id))
+        .run();
+      return true;
+    });
+  }
 }

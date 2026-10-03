@@ -26,6 +26,8 @@ describe('Admin pedidos (e2e)', () => {
   let database: DatabaseService;
   let cookies: string[] = [];
   let orderId = 0;
+  let productId = 0;
+  let stockBefore = 0;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -45,6 +47,8 @@ describe('Admin pedidos (e2e)', () => {
       .all()
       .find((p) => p.availableQuantity > 0);
     if (product === undefined) throw new Error('produto ausente');
+    productId = product.id;
+    stockBefore = product.availableQuantity;
 
     const added = await request(app.getHttpServer())
       .post('/carrinho/itens')
@@ -127,7 +131,7 @@ describe('Admin pedidos (e2e)', () => {
     expect(order?.status).toBe('PAGAMENTO_REALIZADO');
   });
 
-  it('cancela o pedido', async () => {
+  it('cancela o pedido e restaura o estoque', async () => {
     await request(app.getHttpServer())
       .post(`/admin/pedidos/${orderId}/status`)
       .set('Cookie', cookies)
@@ -142,5 +146,13 @@ describe('Admin pedidos (e2e)', () => {
       .all()
       .at(0);
     expect(order?.status).toBe('CANCELADO');
+
+    const product = database.db
+      .select()
+      .from(products)
+      .where(eq(products.id, productId))
+      .all()
+      .at(0);
+    expect(product?.availableQuantity).toBe(stockBefore);
   });
 });

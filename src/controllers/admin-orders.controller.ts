@@ -14,7 +14,7 @@ import type { Response } from 'express';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { OrdersService, type OrderStatus } from '../models/orders.service';
+import { OrdersService } from '../models/orders.service';
 
 const ALLOWED_ACTIONS = ['PAGAMENTO_REALIZADO', 'CANCELADO'] as const;
 
@@ -46,16 +46,22 @@ export class AdminOrdersController {
       response.redirect('/admin/pedidos?erro=Acao+invalida');
       return;
     }
-
     if (this.ordersService.findById(id) === undefined) {
       response.redirect('/admin/pedidos?erro=Pedido+nao+encontrado');
       return;
     }
 
-    this.ordersService.updateStatus(id, status as OrderStatus);
+    if (status === 'CANCELADO') {
+      const cancelled = this.ordersService.cancel(id);
+      response.redirect(
+        cancelled
+          ? '/admin/pedidos?ok=Pedido+cancelado'
+          : '/admin/pedidos?erro=Nao+foi+possivel+cancelar',
+      );
+      return;
+    }
 
-    const okMessage =
-      status === 'CANCELADO' ? 'Pedido+cancelado' : 'Pagamento+confirmado';
-    response.redirect(`/admin/pedidos?ok=${okMessage}`);
+    this.ordersService.updateStatus(id, 'PAGAMENTO_REALIZADO');
+    response.redirect('/admin/pedidos?ok=Pagamento+confirmado');
   }
 }
