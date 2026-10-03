@@ -20,3 +20,11 @@ logs/
 
 # CSS gerado (artefato de build)
 public/css/*.css
+
+# Banco de dados SQLite
+database/*.db
+database/*.db-shm
+database/*.db-wal
+
+# Artefatos do spec-driven (locais)
+.specs/
