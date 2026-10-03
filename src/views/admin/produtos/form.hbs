@@ -1,0 +1,96 @@
+<section class="mx-auto max-w-xl rounded-lg bg-white p-8 shadow-sm">
+  <h2 class="text-2xl font-semibold text-rose-600">{{title}}</h2>
+
+  <form method="post" action="{{action}}" class="mt-6 space-y-4">
+    <div>
+      <label class="block text-sm font-medium" for="name">Nome</label>
+      <input
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        id="name"
+        name="name"
+        value="{{product.name}}"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium" for="description">Descrição</label>
+      <textarea
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        id="description"
+        name="description"
+        rows="3"
+        required
+      >{{product.description}}</textarea>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium" for="price">Preço</label>
+      <input
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        id="price"
+        name="price"
+        type="number"
+        step="0.01"
+        min="0.01"
+        value="{{product.price}}"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium" for="imageUrl">Imagem (URL)</label>
+      <input
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        id="imageUrl"
+        name="imageUrl"
+        type="url"
+        value="{{product.imageUrl}}"
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium" for="categoryId">Categoria</label>
+      <select
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        id="categoryId"
+        name="categoryId"
+        required
+      >
+        {{#each categories}}
+          <option value="{{this.id}}" {{#if (eq this.id ../product.categoryId)}}selected{{/if}}>{{this.name}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium" for="availableQuantity">Quantidade disponível</label>
+      <input
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        id="availableQuantity"
+        name="availableQuantity"
+        type="number"
+        min="0"
+        value="{{product.availableQuantity}}"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium" for="active">Situação</label>
+      <select
+        class="mt-1 w-full rounded border border-stone-300 px-3 py-2"
+        id="active"
+        name="active"
+      >
+        <option value="true" {{#if product.active}}selected{{/if}}>Ativo</option>
+        <option value="false" {{#if product}}{{#unless product.active}}selected{{/unless}}{{/if}}>Inativo</option>
+      </select>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <button class="rounded bg-rose-500 px-4 py-2 font-semibold text-white" type="submit">Salvar</button>
+      <a class="text-rose-600 underline" href="/admin/produtos">Cancelar</a>
+    </div>
+  </form>
+</section>

@@ -1,0 +1,52 @@
+<section class="rounded-lg bg-white p-8 shadow-sm">
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-semibold text-rose-600">Produtos</h2>
+    <a
+      class="rounded bg-rose-500 px-4 py-2 text-sm font-semibold text-white"
+      href="/admin/produtos/novo"
+    >Novo produto</a>
+  </div>
+
+  {{#if ok}}<p class="mt-4 rounded bg-green-50 px-3 py-2 text-sm text-green-700">{{ok}}</p>{{/if}}
+  {{#if erro}}<p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{erro}}</p>{{/if}}
+
+  <table class="mt-6 w-full text-left text-sm">
+    <thead>
+      <tr class="border-b text-stone-500">
+        <th class="py-2">Nome</th>
+        <th>Categoria</th>
+        <th>Preço</th>
+        <th>Estoque</th>
+        <th>Situação</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each products}}
+        <tr class="border-b">
+          <td class="py-2">{{this.name}}</td>
+          <td>{{this.categoryName}}</td>
+          <td>R$ {{this.price}}</td>
+          <td>{{this.availableQuantity}}</td>
+          <td>{{#if this.active}}Ativo{{else}}Inativo{{/if}}</td>
+          <td class="py-2">
+            <div class="flex gap-3">
+              <a class="text-rose-600 underline" href="/admin/produtos/{{this.id}}/editar">Editar</a>
+              <form method="post" action="/admin/produtos/{{this.id}}/ativar">
+                <button class="text-rose-600 underline" type="submit">
+                  {{#if this.active}}Desativar{{else}}Ativar{{/if}}
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  {{#unless products.length}}
+    <p class="mt-6 text-stone-500">Nenhum produto cadastrado.</p>
+  {{/unless}}
+
+  <a class="mt-6 inline-block text-rose-600 underline" href="/admin">Voltar</a>
+</section>

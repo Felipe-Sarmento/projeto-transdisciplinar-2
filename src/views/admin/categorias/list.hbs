@@ -1,0 +1,41 @@
+<section class="mx-auto max-w-2xl rounded-lg bg-white p-8 shadow-sm">
+  <h2 class="text-2xl font-semibold text-rose-600">Categorias</h2>
+
+  {{#if ok}}<p class="mt-4 rounded bg-green-50 px-3 py-2 text-sm text-green-700">{{ok}}</p>{{/if}}
+  {{#if erro}}<p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{erro}}</p>{{/if}}
+
+  <form method="post" action="/admin/categorias" class="mt-6 flex gap-2">
+    <input
+      class="flex-1 rounded border border-stone-300 px-3 py-2"
+      name="name"
+      placeholder="Nova categoria"
+      required
+    />
+    <button class="rounded bg-rose-500 px-4 py-2 font-semibold text-white" type="submit">Adicionar</button>
+  </form>
+
+  <ul class="mt-6 divide-y divide-stone-200">
+    {{#each categories}}
+      <li class="flex items-center gap-3 py-2">
+        <form method="post" action="/admin/categorias/{{this.id}}" class="flex flex-1 gap-2">
+          <input
+            class="flex-1 rounded border border-stone-300 px-3 py-2"
+            name="name"
+            value="{{this.name}}"
+            required
+          />
+          <button class="text-rose-600 underline" type="submit">Salvar</button>
+        </form>
+        <form method="post" action="/admin/categorias/{{this.id}}/excluir">
+          <button class="text-red-600 underline" type="submit">Excluir</button>
+        </form>
+      </li>
+    {{/each}}
+  </ul>
+
+  {{#unless categories.length}}
+    <p class="mt-6 text-stone-500">Nenhuma categoria cadastrada.</p>
+  {{/unless}}
+
+  <a class="mt-6 inline-block text-rose-600 underline" href="/admin">Voltar</a>
+</section>
