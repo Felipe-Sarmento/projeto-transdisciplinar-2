@@ -1,0 +1,22 @@
+# Dependências
+node_modules/
+
+# Build
+dist/
+coverage/
+
+# Variáveis de ambiente
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Sistema / Editor
+.DS_Store
+.idea/
+.vscode/
+
+# CSS gerado (artefato de build)
+public/css/*.css
