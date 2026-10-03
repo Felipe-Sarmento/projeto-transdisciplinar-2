@@ -27,4 +27,11 @@ describe('AppController (e2e)', () => {
         expect(res.text).toContain('Cupcake Gourmet');
       });
   });
+
+  it('/ (GET) responde com HTML', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .expect(200)
+      .expect('Content-Type', /html/);
+  });
 });
