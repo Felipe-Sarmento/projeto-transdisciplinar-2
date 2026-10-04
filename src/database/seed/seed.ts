@@ -18,7 +18,8 @@ const PRODUCTS = [
     name: 'Baunilha Clássico',
     description: 'Massa de baunilha com buttercream e granulado.',
     price: 8.5,
-    imageUrl: 'https://placehold.co/300x300/fda4af/ffffff?text=Baunilha',
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7grzJD04vXZCW7kfzh7zLITI0z9XkeSYWfsz-KrsRqw&s=10',
     availableQuantity: 20,
     categorySlug: 'tradicionais',
   },
@@ -26,7 +27,8 @@ const PRODUCTS = [
     name: 'Chocolate Belga',
     description: 'Massa de chocolate belga com ganache.',
     price: 9.0,
-    imageUrl: 'https://placehold.co/300x300/9a3412/ffffff?text=Chocolate',
+    imageUrl:
+      'https://santaluzia.vtexassets.com/arquivos/ids/1000923/263508.png',
     availableQuantity: 15,
     categorySlug: 'tradicionais',
   },
@@ -34,7 +36,8 @@ const PRODUCTS = [
     name: 'Red Velvet',
     description: 'Massa vermelha com cream cheese frosting.',
     price: 12.0,
-    imageUrl: 'https://placehold.co/300x300/be123c/ffffff?text=Red+Velvet',
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSl2nbXFtiAWLZG-A8ILvjM7FlOwCw7T9doVhcjQ93lAwxZXwbUh92iA_w&s=10',
     availableQuantity: 12,
     categorySlug: 'gourmet',
   },
@@ -42,7 +45,8 @@ const PRODUCTS = [
     name: 'Pistache com Framboesa',
     description: 'Massa de pistache com recheio de framboesa.',
     price: 14.5,
-    imageUrl: 'https://placehold.co/300x300/15803d/ffffff?text=Pistache',
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4t7p7EAUNN89CXdegM3diC_I28BkbktB65uAa29aK1FvZ_ApzFxgTfrc&s=10',
     availableQuantity: 8,
     categorySlug: 'gourmet',
   },
@@ -50,7 +54,8 @@ const PRODUCTS = [
     name: 'Vegano de Coco',
     description: 'Massa vegana de coco com cobertura cremosa.',
     price: 10.0,
-    imageUrl: 'https://placehold.co/300x300/0f766e/ffffff?text=Coco',
+    imageUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRW48iGsWR96bBV2qnntXNKmHoDgCoeDZw2ySF59cObg&s=10',
     availableQuantity: 10,
     categorySlug: 'veganos',
   },
@@ -58,7 +63,8 @@ const PRODUCTS = [
     name: 'Vegano de Cacau',
     description: 'Massa vegana de cacau com ganache de castanha.',
     price: 10.5,
-    imageUrl: 'https://placehold.co/300x300/7c2d12/ffffff?text=Cacau',
+    imageUrl:
+      'https://www.vaisefood.com/wp-content/uploads/2014/03/cupcake.jpg',
     availableQuantity: 0,
     categorySlug: 'veganos',
   },
@@ -105,7 +111,10 @@ export async function seedDatabase(
     const existing = existingByName.get(product.name);
     if (existing !== undefined) {
       db.update(products)
-        .set({ availableQuantity: product.availableQuantity })
+        .set({
+          availableQuantity: product.availableQuantity,
+          imageUrl: product.imageUrl,
+        })
         .where(eq(products.id, existing.id))
         .run();
       continue;
