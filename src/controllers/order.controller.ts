@@ -9,8 +9,13 @@ import {
   Render,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { Roles } from '../common/decorators/roles.decorator';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import type { RequestUser } from '../common/strategies/jwt.strategy';
 import { CartService } from '../models/cart.service';
 import { OrdersService, isPaidStatus } from '../models/orders.service';
 
@@ -22,12 +27,15 @@ export class OrderController {
   ) {}
 
   @Post('carrinho/confirmar')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('CLIENTE')
   confirm(
     @Req() request: Request,
     @Body('customerName') customerName: string,
     @Body('deliveryAddress') deliveryAddress: string,
     @Res() response: Response,
   ): void {
+    const user = request.user as RequestUser;
     const items = this.cartService.parse(request.cookies?.cart);
     const view = this.cartService.buildView(items);
 
@@ -45,6 +53,7 @@ export class OrderController {
     }
 
     const orderId = this.ordersService.create({
+      userId: user.id,
       customerName: name,
       deliveryAddress: address,
       items: view.lines.map((line) => ({
@@ -64,11 +73,16 @@ export class OrderController {
   }
 
   @Get('pedido/:id')
+  @UseGuards(JwtAuthGuard)
   @Render('pedido/show')
-  show(@Param('id', ParseIntPipe) id: number) {
+  show(@Req() request: Request, @Param('id', ParseIntPipe) id: number) {
+    const user = request.user as RequestUser;
     const order = this.ordersService.findById(id);
 
-    if (order === undefined) {
+    if (
+      order === undefined ||
+      (order.userId !== user.id && user.role !== 'ADMIN')
+    ) {
       throw new NotFoundException('Pedido não encontrado');
     }
 

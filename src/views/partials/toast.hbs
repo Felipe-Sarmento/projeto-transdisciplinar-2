@@ -1,0 +1,17 @@
+{{#if toast}}
+  <div
+    id="toast"
+    class="toast {{#if (eq toast.type 'error')}}toast-error{{else}}toast-success{{/if}}"
+    role="status"
+    aria-live="polite"
+  >
+    <span class="toast-icon" aria-hidden="true">{{#if (eq toast.type 'error')}}⚠️{{else}}✅{{/if}}</span>
+    <p class="toast-message">{{toast.message}}</p>
+    <button
+      class="toast-close"
+      type="button"
+      data-toast-close
+      aria-label="Fechar notificação"
+    >✕</button>
+  </div>
+{{/if}}

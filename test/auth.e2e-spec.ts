@@ -1,15 +1,36 @@
 import { INestApplication } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { configureApp } from './../src/app.setup';
 import { DatabaseService } from './../src/database/database.service';
-import { seedDatabase } from './../src/database/seed/seed';
+import { users } from './../src/database/schema/schema';
+import {
+  CLIENTE_EMAIL,
+  CLIENTE_PASSWORD,
+  seedDatabase,
+} from './../src/database/seed/seed';
+
+function flashCookie(response: {
+  headers: Record<string, unknown>;
+}): string | undefined {
+  const list = response.headers['set-cookie'];
+  if (!Array.isArray(list)) {
+    return undefined;
+  }
+  const raw = list.find(
+    (cookie): cookie is string =>
+      typeof cookie === 'string' && cookie.startsWith('flash='),
+  );
+  return raw?.split(';')[0];
+}
 
 describe('Autenticação (e2e)', () => {
   let app: INestApplication<App>;
+  let database: DatabaseService;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -20,7 +41,7 @@ describe('Autenticação (e2e)', () => {
     configureApp(app);
     await app.init();
 
-    const database = moduleFixture.get(DatabaseService);
+    database = moduleFixture.get(DatabaseService);
     await seedDatabase(database.db);
   });
 
@@ -89,6 +110,104 @@ describe('Autenticação (e2e)', () => {
       expect(setCookie).toBeDefined();
       expect(String(setCookie)).toContain('access_token=');
       expect(String(setCookie)).toContain('HttpOnly');
+    });
+  });
+
+  describe('GET /cadastro', () => {
+    it('renderiza o formulário de cadastro', () => {
+      return request(app.getHttpServer())
+        .get('/cadastro')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect((res) => {
+          expect(res.text).toContain('Criar conta');
+        });
+    });
+  });
+
+  describe('POST /cadastro', () => {
+    it('cria a conta, grava o cookie e redireciona para o catálogo', async () => {
+      const email = `novo-${Date.now()}@cupcake.local`;
+
+      const response = await request(app.getHttpServer())
+        .post('/cadastro')
+        .type('form')
+        .send({ name: 'Novo Cliente', email, password: 'senha1234' })
+        .expect(302)
+        .expect('Location', '/');
+
+      const setCookie = response.headers['set-cookie'];
+      expect(String(setCookie)).toContain('access_token=');
+
+      database.db.delete(users).where(eq(users.email, email)).run();
+    });
+
+    it('rejeita e-mail já cadastrado', () => {
+      return request(app.getHttpServer())
+        .post('/cadastro')
+        .type('form')
+        .send({
+          name: 'Duplicado',
+          email: CLIENTE_EMAIL,
+          password: 'senha1234',
+        })
+        .expect(409)
+        .expect((res) => {
+          expect(res.text).toContain('já está cadastrado');
+        });
+    });
+  });
+
+  describe('POST /login (CLIENTE)', () => {
+    it('autentica o cliente e redireciona para o catálogo', () => {
+      return request(app.getHttpServer())
+        .post('/login')
+        .type('form')
+        .send({ email: CLIENTE_EMAIL, password: CLIENTE_PASSWORD })
+        .expect(302)
+        .expect('Location', '/');
+    });
+  });
+
+  describe('Toast de login', () => {
+    it('mostra boas-vindas após login', async () => {
+      const login = await request(app.getHttpServer())
+        .post('/login')
+        .type('form')
+        .send({ email: CLIENTE_EMAIL, password: CLIENTE_PASSWORD })
+        .expect(302);
+
+      const flash = flashCookie(login);
+      expect(flash).toBeDefined();
+
+      const page = await request(app.getHttpServer())
+        .get('/')
+        .set('Cookie', flash as string)
+        .expect(200);
+      expect(page.text).toContain('Bem-vindo(a), Cliente Exemplo!');
+    });
+  });
+
+  describe('Toast de cadastro', () => {
+    it('mostra boas-vindas após criar a conta', async () => {
+      const email = `toast-${Date.now()}@cupcake.local`;
+
+      const register = await request(app.getHttpServer())
+        .post('/cadastro')
+        .type('form')
+        .send({ name: 'Cliente Toast', email, password: 'senha1234' })
+        .expect(302);
+
+      const flash = flashCookie(register);
+      expect(flash).toBeDefined();
+
+      const page = await request(app.getHttpServer())
+        .get('/')
+        .set('Cookie', flash as string)
+        .expect(200);
+      expect(page.text).toContain('Conta criada com sucesso');
+
+      database.db.delete(users).where(eq(users.email, email)).run();
     });
   });
 

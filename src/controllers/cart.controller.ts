@@ -11,6 +11,7 @@ import {
   Res,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { setFlash } from '../common/utils/flash';
 import { CartService } from '../models/cart.service';
 import { ProductsService } from '../models/products.service';
 
@@ -46,6 +47,7 @@ export class CartController {
       !product.active ||
       product.availableQuantity <= 0
     ) {
+      setFlash(response, 'error', 'Produto indisponível no momento.');
       response.redirect(this.backTo(request, '/carrinho'));
       return;
     }
@@ -59,6 +61,7 @@ export class CartController {
     );
 
     this.save(response, updated);
+    setFlash(response, 'success', `${product.name} adicionado ao carrinho.`);
     response.redirect(this.backTo(request, '/carrinho'));
   }
 
@@ -82,6 +85,13 @@ export class CartController {
     );
 
     this.save(response, updated);
+    setFlash(
+      response,
+      'success',
+      safeQuantity <= 0
+        ? 'Item removido do carrinho.'
+        : 'Quantidade atualizada.',
+    );
     response.redirect('/carrinho');
   }
 
@@ -95,6 +105,7 @@ export class CartController {
     const updated = this.cartService.remove(items, id);
 
     this.save(response, updated);
+    setFlash(response, 'success', 'Item removido do carrinho.');
     response.redirect('/carrinho');
   }
 

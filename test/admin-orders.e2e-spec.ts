@@ -8,7 +8,11 @@ import { AppModule } from './../src/app.module';
 import { configureApp } from './../src/app.setup';
 import { DatabaseService } from './../src/database/database.service';
 import { orderItems, orders, products } from './../src/database/schema/schema';
-import { seedDatabase } from './../src/database/seed/seed';
+import {
+  CLIENTE_EMAIL,
+  CLIENTE_PASSWORD,
+  seedDatabase,
+} from './../src/database/seed/seed';
 
 function cartCookie(response: {
   headers: Record<string, unknown>;
@@ -17,6 +21,17 @@ function cartCookie(response: {
   if (!Array.isArray(list)) return undefined;
   const raw = list.find(
     (c): c is string => typeof c === 'string' && c.startsWith('cart='),
+  );
+  return raw?.split(';')[0];
+}
+
+function accessCookie(response: {
+  headers: Record<string, unknown>;
+}): string | undefined {
+  const list = response.headers['set-cookie'];
+  if (!Array.isArray(list)) return undefined;
+  const raw = list.find(
+    (c): c is string => typeof c === 'string' && c.startsWith('access_token='),
   );
   return raw?.split(';')[0];
 }
@@ -57,9 +72,16 @@ describe('Admin pedidos (e2e)', () => {
       .expect(302);
     const cart = cartCookie(added) as string;
 
+    const clientLogin = await request(app.getHttpServer())
+      .post('/login')
+      .type('form')
+      .send({ email: CLIENTE_EMAIL, password: CLIENTE_PASSWORD })
+      .expect(302);
+    const clientAuth = accessCookie(clientLogin) as string;
+
     const confirm = await request(app.getHttpServer())
       .post('/carrinho/confirmar')
-      .set('Cookie', cart)
+      .set('Cookie', `${clientAuth}; ${cart}`)
       .type('form')
       .send({ customerName: 'Cliente Pedido', deliveryAddress: 'Rua B, 45' })
       .expect(302);
