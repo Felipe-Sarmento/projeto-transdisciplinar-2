@@ -1,98 +1,130 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🧁 Cupcake Gourmet
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Loja virtual de cupcakes gourmet — solução do **Projeto Integrador Transdisciplinar em Engenharia de Software II**. Clientes navegam pelo catálogo, montam o carrinho e finalizam o pedido como convidados (pagamento via PIX fictício); administradores gerenciam catálogo e pedidos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📚 Stack
 
-## Description
+| Camada | Tecnologia |
+| --- | --- |
+| Framework | NestJS (modo MVC) |
+| Linguagem | TypeScript (estrito) |
+| Views | Handlebars (`express-handlebars`) |
+| Estilização | Tailwind CSS v4 |
+| Banco | SQLite (`better-sqlite3`) |
+| ORM | Drizzle ORM + drizzle-kit |
+| Autenticação | JWT (Passport) em cookie `httpOnly` |
+| Testes | Jest + Supertest |
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## ✨ Funcionalidades
 
-## Project setup
+- **Catálogo** público: listar, filtrar por categoria e ver detalhe (só produtos ativos).
+- **Carrinho** em cookie: adicionar, alterar quantidade, remover e subtotal (estoque enforced).
+- **Checkout como convidado**: nome + endereço → pedido `PENDENTE` + tela de pagamento PIX (fictício).
+- **Baixa de estoque** no checkout e **restauração** ao cancelar.
+- **Confirmação de pagamento** pelo admin → cliente vê o comprovante.
+- **Admin**: login (JWT), CRUD de produtos/categorias e gestão de pedidos (confirmar/cancelar).
+- Página 404 e acessibilidade básica.
 
-```bash
-$ pnpm install
-```
+## 🚀 Como rodar
 
-## Compile and run the project
+Pré-requisitos: **Node.js 22+** e **pnpm**.
 
 ```bash
-# development
-$ pnpm run start
+pnpm install          # dependências
+cp .env.example .env  # variáveis de ambiente
+pnpm db:push          # cria/atualiza o schema no SQLite
+pnpm db:seed          # dados de exemplo (admin + categorias + cupcakes)
+pnpm build:css        # gera o CSS do Tailwind
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+pnpm start:dev        # roda em http://localhost:3000 (watch)
 ```
 
-## Run tests
+> Durante o desenvolvimento, rode `pnpm watch:css` em outro terminal para o Tailwind recompilar junto.
+
+### Credenciais de desenvolvimento (seed)
+
+- **E-mail:** `admin@cupcake.local`
+- **Senha:** `admin123`
+
+### Variáveis de ambiente (`.env.example`)
+
+| Variável | Descrição | Padrão |
+| --- | --- | --- |
+| `NODE_ENV` | Ambiente | `development` |
+| `PORT` | Porta do servidor | `3000` |
+| `DATABASE_URL` | Caminho do arquivo SQLite | `./database/sqlite.db` |
+| `JWT_SECRET` | Segredo do JWT | fallback de dev |
+
+## 🗺️ Rotas
+
+**Público / cliente**
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/` | Catálogo (filtro `?categoria=slug`) |
+| GET | `/produtos/:id` | Detalhe do produto |
+| GET | `/carrinho` | Carrinho + formulário de checkout |
+| POST | `/carrinho/itens` | Adicionar item |
+| POST | `/carrinho/itens/:id` | Atualizar quantidade |
+| POST | `/carrinho/itens/:id/remover` | Remover item |
+| POST | `/carrinho/confirmar` | Finalizar pedido (convidado) |
+| GET | `/pedido/:id` | Status do pedido (PIX / comprovante / cancelado) |
+
+**Administração** (requer login `ADMIN`)
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET/POST | `/login`, `/logout` | Autenticação |
+| GET | `/admin` | Painel |
+| GET/POST | `/admin/produtos`, `/admin/produtos/:id` | CRUD de produtos |
+| POST | `/admin/produtos/:id/ativar` | Ativar/desativar |
+| GET/POST | `/admin/categorias`, `/admin/categorias/:id` | CRUD de categorias |
+| GET | `/admin/pedidos` | Lista de pedidos |
+| POST | `/admin/pedidos/:id/status` | Confirmar pagamento / cancelar |
+
+## 🏗️ Arquitetura (MVC)
+
+```
+src/
+├── controllers/   # C — recebem requisições e renderizam views
+├── models/        # M — services (regras de negócio) e acesso a dados
+├── views/         # V — templates Handlebars (layouts/partials)
+├── database/      # schema Drizzle, DatabaseService e seed
+├── common/        # guards, pipes, filters, decorators, dto, strategies
+├── styles/        # entrada do Tailwind
+├── app.module.ts  # módulo único
+├── app.setup.ts   # configurações da app (view engine, cookies, filtros)
+└── main.ts        # bootstrap
+```
+
+- **Model**: `DatabaseService` expõe o Drizzle; services em `src/models`.
+- **View**: `src/views` (layout `main.hbs` + partials).
+- **Controller**: `src/controllers` (MVC server-side, `@Render`).
+- **Auth**: JWT em cookie `httpOnly`; guards por perfil (`ADMIN`).
+
+## 🧪 Testes
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+pnpm test       # unitários (Jest)
+pnpm test:e2e   # HTTP (Jest + Supertest)
 ```
 
-## Deployment
+## 🛠️ Scripts
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+| Script | Descrição |
+| --- | --- |
+| `pnpm start:dev` | Servidor em watch |
+| `pnpm build` / `pnpm start:prod` | Build e execução de produção |
+| `pnpm lint` | ESLint |
+| `pnpm build:css` / `pnpm watch:css` | Gera/observa o CSS |
+| `pnpm db:push` | Sincroniza o schema com o SQLite |
+| `pnpm db:seed` | Popula dados de exemplo |
+| `pnpm db:studio` | UI de inspeção do banco |
+| `pnpm test` / `pnpm test:e2e` | Testes |
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 📌 Observações
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- **Sem login de cliente**: o checkout é feito como convidado (nome + endereço).
+- **PIX fictício**: sem integração real; apenas exemplificação.
+- **Carrinho em cookie** (`httpOnly`), revalidado contra o banco a cada request.
+- Documentação de planejamento em `Projeto-Integrador-Disciplinar/software/` (`project.md`, `requirements.md`, `rules.md`).
