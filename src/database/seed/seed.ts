@@ -7,6 +7,9 @@ import { categories, products, users } from '../schema/schema';
 export const ADMIN_EMAIL = 'admin@cupcake.local';
 export const ADMIN_PASSWORD = 'admin123';
 
+export const CLIENTE_EMAIL = 'cliente@cupcake.local';
+export const CLIENTE_PASSWORD = 'cliente123';
+
 const CATEGORIES = [
   { name: 'Tradicionais', slug: 'tradicionais' },
   { name: 'Gourmet', slug: 'gourmet' },
@@ -74,6 +77,7 @@ export async function seedDatabase(
   db: BetterSQLite3Database<typeof schema>,
 ): Promise<void> {
   const passwordHash = await hash(ADMIN_PASSWORD);
+  const clientePasswordHash = await hash(CLIENTE_PASSWORD);
 
   db.insert(users)
     .values({
@@ -81,6 +85,16 @@ export async function seedDatabase(
       email: ADMIN_EMAIL,
       passwordHash,
       role: 'ADMIN',
+    })
+    .onConflictDoNothing()
+    .run();
+
+  db.insert(users)
+    .values({
+      name: 'Cliente Exemplo',
+      email: CLIENTE_EMAIL,
+      passwordHash: clientePasswordHash,
+      role: 'CLIENTE',
     })
     .onConflictDoNothing()
     .run();

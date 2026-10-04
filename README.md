@@ -1,6 +1,6 @@
 # 🧁 Cupcake Gourmet
 
-Loja virtual de cupcakes gourmet — solução do **Projeto Integrador Transdisciplinar em Engenharia de Software II**. Clientes navegam pelo catálogo, montam o carrinho e finalizam o pedido como convidados (pagamento via PIX fictício); administradores gerenciam catálogo e pedidos.
+Loja virtual de cupcakes gourmet — solução do **Projeto Integrador Transdisciplinar em Engenharia de Software II**. Clientes navegam pelo catálogo público, criam conta, montam o carrinho e finalizam o pedido autenticados (pagamento via PIX fictício); administradores gerenciam catálogo e pedidos.
 
 ## 📚 Stack
 
@@ -18,8 +18,10 @@ Loja virtual de cupcakes gourmet — solução do **Projeto Integrador Transdisc
 ## ✨ Funcionalidades
 
 - **Catálogo** público: listar, filtrar por categoria e ver detalhe (só produtos ativos).
+- **Conta de cliente** (`CLIENTE`): cadastro (`/cadastro`) e login compartilhado com o admin.
 - **Carrinho** em cookie: adicionar, alterar quantidade, remover e subtotal (estoque enforced).
-- **Checkout como convidado**: nome + endereço → pedido `PENDENTE` + tela de pagamento PIX (fictício).
+- **Checkout autenticado**: requer login como `CLIENTE`; nome + endereço → pedido `PENDENTE` + tela de pagamento PIX (fictício).
+- **Pedido privado**: `GET /pedido/:id` visível apenas para o dono do pedido e o `ADMIN`.
 - **Baixa de estoque** no checkout e **restauração** ao cancelar.
 - **Confirmação de pagamento** pelo admin → cliente vê o comprovante.
 - **Admin**: login (JWT), CRUD de produtos/categorias e gestão de pedidos (confirmar/cancelar).
@@ -43,8 +45,8 @@ pnpm start:dev        # roda em http://localhost:3000 (watch)
 
 ### Credenciais de desenvolvimento (seed)
 
-- **E-mail:** `admin@cupcake.local`
-- **Senha:** `admin123`
+- **Admin** — e-mail: `admin@cupcake.local` / senha: `admin123`
+- **Cliente** — e-mail: `cliente@cupcake.local` / senha: `cliente123`
 
 ### Variáveis de ambiente (`.env.example`)
 
@@ -63,12 +65,13 @@ pnpm start:dev        # roda em http://localhost:3000 (watch)
 | --- | --- | --- |
 | GET | `/` | Catálogo (filtro `?categoria=slug`) |
 | GET | `/produtos/:id` | Detalhe do produto |
-| GET | `/carrinho` | Carrinho + formulário de checkout |
+| GET | `/carrinho` | Carrinho + checkout |
 | POST | `/carrinho/itens` | Adicionar item |
 | POST | `/carrinho/itens/:id` | Atualizar quantidade |
 | POST | `/carrinho/itens/:id/remover` | Remover item |
-| POST | `/carrinho/confirmar` | Finalizar pedido (convidado) |
-| GET | `/pedido/:id` | Status do pedido (PIX / comprovante / cancelado) |
+| GET/POST | `/cadastro` | Criar conta de `CLIENTE` |
+| POST | `/carrinho/confirmar` | Finalizar pedido (requer login `CLIENTE`) |
+| GET | `/pedido/:id` | Status do pedido (apenas dono ou `ADMIN`) |
 
 **Administração** (requer login `ADMIN`)
 
@@ -100,7 +103,7 @@ src/
 - **Model**: `DatabaseService` expõe o Drizzle; services em `src/models`.
 - **View**: `src/views` (layout `main.hbs` + partials).
 - **Controller**: `src/controllers` (MVC server-side, `@Render`).
-- **Auth**: JWT em cookie `httpOnly`; guards por perfil (`ADMIN`).
+- **Auth**: JWT em cookie `httpOnly`; guards por perfil (`CLIENTE`, `ADMIN`).
 
 ## 🧪 Testes
 
@@ -124,7 +127,8 @@ pnpm test:e2e   # HTTP (Jest + Supertest)
 
 ## 📌 Observações
 
-- **Sem login de cliente**: o checkout é feito como convidado (nome + endereço).
+- **Checkout autenticado**: é preciso ter conta `CLIENTE` (login/cadastro) para finalizar o pedido.
+- **Pedido privado**: `GET /pedido/:id` só é acessível pelo dono do pedido ou pelo `ADMIN`.
 - **PIX fictício**: sem integração real; apenas exemplificação.
 - **Carrinho em cookie** (`httpOnly`), revalidado contra o banco a cada request.
 - Documentação de planejamento em `Projeto-Integrador-Disciplinar/software/` (`project.md`, `requirements.md`, `rules.md`).

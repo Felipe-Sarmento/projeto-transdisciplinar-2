@@ -2,15 +2,29 @@
   <div class="card p-8">
     <div class="flex flex-col items-center text-center">
       <span class="text-4xl" aria-hidden="true">🧁</span>
-      <h1 class="mt-2 text-2xl font-extrabold text-stone-800">Entrar</h1>
-      <p class="mt-1 text-sm text-stone-500">Acesse sua conta para continuar.</p>
+      <h1 class="mt-2 text-2xl font-extrabold text-stone-800">Criar conta</h1>
+      <p class="mt-1 text-sm text-stone-500">Cadastre-se para finalizar seus pedidos.</p>
     </div>
 
     {{#if error}}
       <p class="alert alert-error mt-6" role="alert">{{error}}</p>
     {{/if}}
 
-    <form method="post" action="/login" class="mt-6 space-y-4">
+    <form method="post" action="/cadastro" class="mt-6 space-y-4">
+      <div>
+        <label class="field-label" for="name">Nome</label>
+        <input
+          class="input mt-1"
+          type="text"
+          id="name"
+          name="name"
+          autocomplete="name"
+          minlength="2"
+          autofocus
+          required
+        />
+      </div>
+
       <div>
         <label class="field-label" for="email">E-mail</label>
         <input
@@ -19,7 +33,6 @@
           id="email"
           name="email"
           autocomplete="email"
-          autofocus
           required
         />
       </div>
@@ -31,18 +44,18 @@
           type="password"
           id="password"
           name="password"
-          autocomplete="current-password"
+          autocomplete="new-password"
           minlength="8"
           required
         />
       </div>
 
-      <button class="btn btn-primary w-full" type="submit">Entrar</button>
+      <button class="btn btn-primary w-full" type="submit">Criar conta</button>
     </form>
 
     <p class="mt-4 text-center text-sm text-stone-500">
-      Não tem conta?
-      <a class="font-semibold text-rose-600 hover:underline" href="/cadastro">Criar conta</a>
+      Já tem conta?
+      <a class="font-semibold text-rose-600 hover:underline" href="/login">Entrar</a>
     </p>
   </div>
 </section>

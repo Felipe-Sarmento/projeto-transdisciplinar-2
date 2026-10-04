@@ -49,17 +49,25 @@
           <span>R$ {{subtotal}}</span>
         </div>
 
-        <form method="post" action="/carrinho/confirmar" class="mt-4 space-y-3">
-          <div>
-            <label class="field-label" for="customerName">Nome</label>
-            <input class="input mt-1" id="customerName" name="customerName" autocomplete="name" required />
-          </div>
-          <div>
-            <label class="field-label" for="deliveryAddress">Endereço de entrega</label>
-            <input class="input mt-1" id="deliveryAddress" name="deliveryAddress" placeholder="Rua, número, bairro, cidade" required />
-          </div>
-          <button class="btn btn-primary w-full" type="submit">Confirmar pedido</button>
-        </form>
+        {{#if (eq currentUser.role 'CLIENTE')}}
+          <form method="post" action="/carrinho/confirmar" class="mt-4 space-y-3">
+            <div>
+              <label class="field-label" for="customerName">Nome</label>
+              <input class="input mt-1" id="customerName" name="customerName" value="{{currentUser.name}}" autocomplete="name" required />
+            </div>
+            <div>
+              <label class="field-label" for="deliveryAddress">Endereço de entrega</label>
+              <input class="input mt-1" id="deliveryAddress" name="deliveryAddress" placeholder="Rua, número, bairro, cidade" required />
+            </div>
+            <button class="btn btn-primary w-full" type="submit">Confirmar pedido</button>
+          </form>
+        {{else}}
+          <p class="mt-4 text-sm text-stone-600">
+            Para finalizar o pedido, entre na sua conta ou crie um cadastro.
+          </p>
+          <a class="btn btn-primary mt-3 w-full" href="/cadastro">Criar conta</a>
+          <a class="btn btn-secondary mt-2 w-full" href="/login">Já tenho conta</a>
+        {{/if}}
 
         <a class="btn btn-ghost mt-2 w-full" href="/">Continuar comprando</a>
       </aside>

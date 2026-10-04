@@ -10,6 +10,7 @@ export interface OrderItemInput {
 }
 
 export interface OrderInput {
+  userId?: number;
   customerName: string;
   deliveryAddress: string;
   items: OrderItemInput[];
@@ -25,6 +26,7 @@ export interface OrderLine {
 
 export interface OrderDetail {
   id: number;
+  userId: number | null;
   customerName: string;
   status: string;
   total: number;
@@ -103,6 +105,7 @@ export class OrdersService {
       const result = tx
         .insert(orders)
         .values({
+          userId: input.userId ?? null,
           customerName: input.customerName,
           deliveryAddress: input.deliveryAddress,
           total: Math.round(total * 100) / 100,
@@ -158,6 +161,7 @@ export class OrdersService {
 
     return {
       id: order.id,
+      userId: order.userId,
       customerName: order.customerName,
       status: order.status,
       total: order.total,
