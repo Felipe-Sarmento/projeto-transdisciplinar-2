@@ -7,6 +7,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { engine } from 'express-handlebars';
 import { AuthRedirectFilter } from './common/filters/auth-redirect.filter';
 import { NotFoundFilter } from './common/filters/not-found.filter';
+import { FLASH_COOKIE, type Toast } from './common/utils/flash';
 
 export function configureApp(app: NestExpressApplication): void {
   app.use(cookieParser());
@@ -36,6 +37,20 @@ export function configureApp(app: NestExpressApplication): void {
         const quantity = Number((entry as { quantity?: unknown }).quantity);
         return sum + (Number.isFinite(quantity) ? quantity : 0);
       }, 0);
+    }
+
+    const flash = cookies?.[FLASH_COOKIE];
+    if (flash !== undefined && flash !== null) {
+      if (typeof flash === 'object') {
+        res.locals.toast = flash as Toast;
+      } else if (typeof flash === 'string') {
+        try {
+          res.locals.toast = JSON.parse(flash) as Toast;
+        } catch {
+          // flash inválido: ignora
+        }
+      }
+      res.clearCookie(FLASH_COOKIE);
     }
 
     next();

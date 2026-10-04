@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Render, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { LoginDto } from '../common/dto/login.dto';
 import { RegisterDto } from '../common/dto/register.dto';
+import { setFlash } from '../common/utils/flash';
 import { AuthService } from '../models/auth.service';
 
 const COOKIE_NAME = 'access_token';
@@ -30,6 +31,7 @@ export class AuthController {
     }
 
     this.setSession(response, await this.authService.signToken(user));
+    setFlash(response, 'success', `Bem-vindo(a), ${user.name}!`);
     response.redirect(user.role === 'ADMIN' ? '/admin' : '/');
   }
 
@@ -59,6 +61,11 @@ export class AuthController {
     }
 
     this.setSession(response, await this.authService.signToken(user));
+    setFlash(
+      response,
+      'success',
+      `Conta criada com sucesso. Bem-vindo(a), ${user.name}!`,
+    );
     response.redirect('/');
   }
 

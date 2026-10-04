@@ -76,6 +76,30 @@
     @apply bg-red-50 text-red-700 ring-1 ring-red-200;
   }
 
+  .toast {
+    @apply fixed right-4 top-20 z-50 flex w-[min(22rem,calc(100vw-2rem))] items-start gap-3 rounded-xl px-4 py-3 text-sm font-semibold shadow-lg ring-1 transition duration-300 ease-out;
+    animation: toast-in 0.25s ease-out both;
+  }
+  .toast-success {
+    @apply bg-green-50 text-green-800 ring-green-200;
+  }
+  .toast-error {
+    @apply bg-red-50 text-red-800 ring-red-200;
+  }
+  .toast-icon {
+    @apply leading-snug;
+  }
+  .toast-message {
+    @apply flex-1 leading-snug;
+  }
+  .toast-close {
+    @apply -mr-1 rounded-md px-1.5 py-0.5 text-base leading-none opacity-60 transition hover:opacity-100;
+  }
+  .toast-hide {
+    @apply opacity-0;
+    transform: translateY(-0.5rem);
+  }
+
   .nav-link {
     @apply rounded-md px-2 py-1 text-sm font-semibold text-stone-600 transition hover:text-rose-600;
   }
@@ -98,5 +122,16 @@
   }
   .table-base tbody tr:hover {
     @apply bg-stone-50;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

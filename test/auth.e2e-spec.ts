@@ -14,6 +14,20 @@ import {
   seedDatabase,
 } from './../src/database/seed/seed';
 
+function flashCookie(response: {
+  headers: Record<string, unknown>;
+}): string | undefined {
+  const list = response.headers['set-cookie'];
+  if (!Array.isArray(list)) {
+    return undefined;
+  }
+  const raw = list.find(
+    (cookie): cookie is string =>
+      typeof cookie === 'string' && cookie.startsWith('flash='),
+  );
+  return raw?.split(';')[0];
+}
+
 describe('Autenticação (e2e)', () => {
   let app: INestApplication<App>;
   let database: DatabaseService;
@@ -152,6 +166,48 @@ describe('Autenticação (e2e)', () => {
         .send({ email: CLIENTE_EMAIL, password: CLIENTE_PASSWORD })
         .expect(302)
         .expect('Location', '/');
+    });
+  });
+
+  describe('Toast de login', () => {
+    it('mostra boas-vindas após login', async () => {
+      const login = await request(app.getHttpServer())
+        .post('/login')
+        .type('form')
+        .send({ email: CLIENTE_EMAIL, password: CLIENTE_PASSWORD })
+        .expect(302);
+
+      const flash = flashCookie(login);
+      expect(flash).toBeDefined();
+
+      const page = await request(app.getHttpServer())
+        .get('/')
+        .set('Cookie', flash as string)
+        .expect(200);
+      expect(page.text).toContain('Bem-vindo(a), Cliente Exemplo!');
+    });
+  });
+
+  describe('Toast de cadastro', () => {
+    it('mostra boas-vindas após criar a conta', async () => {
+      const email = `toast-${Date.now()}@cupcake.local`;
+
+      const register = await request(app.getHttpServer())
+        .post('/cadastro')
+        .type('form')
+        .send({ name: 'Cliente Toast', email, password: 'senha1234' })
+        .expect(302);
+
+      const flash = flashCookie(register);
+      expect(flash).toBeDefined();
+
+      const page = await request(app.getHttpServer())
+        .get('/')
+        .set('Cookie', flash as string)
+        .expect(200);
+      expect(page.text).toContain('Conta criada com sucesso');
+
+      database.db.delete(users).where(eq(users.email, email)).run();
     });
   });
 

@@ -24,6 +24,20 @@ function cartCookie(response: {
   return raw?.split(';')[0];
 }
 
+function flashCookie(response: {
+  headers: Record<string, unknown>;
+}): string | undefined {
+  const list = response.headers['set-cookie'];
+  if (!Array.isArray(list)) {
+    return undefined;
+  }
+  const raw = list.find(
+    (cookie): cookie is string =>
+      typeof cookie === 'string' && cookie.startsWith('flash='),
+  );
+  return raw?.split(';')[0];
+}
+
 describe('Carrinho (e2e)', () => {
   let app: INestApplication<App>;
   let database: DatabaseService;
@@ -148,5 +162,41 @@ describe('Carrinho (e2e)', () => {
       .set('Cookie', cookie as string)
       .expect(200);
     expect(cart.text).not.toContain('Baunilha Clássico');
+  });
+
+  it('mostra toast ao adicionar um item', async () => {
+    const added = await request(app.getHttpServer())
+      .post('/carrinho/itens')
+      .set('Cookie', cookie as string)
+      .type('form')
+      .send({ productId: String(pistacheId) })
+      .expect(302);
+
+    const flash = flashCookie(added);
+    expect(flash).toBeDefined();
+
+    const page = await request(app.getHttpServer())
+      .get('/')
+      .set('Cookie', flash as string)
+      .expect(200);
+    expect(page.text).toContain('adicionado ao carrinho');
+  });
+
+  it('mostra toast de erro ao adicionar produto esgotado', async () => {
+    const added = await request(app.getHttpServer())
+      .post('/carrinho/itens')
+      .set('Cookie', cookie as string)
+      .type('form')
+      .send({ productId: String(esgotadoId) })
+      .expect(302);
+
+    const flash = flashCookie(added);
+    expect(flash).toBeDefined();
+
+    const page = await request(app.getHttpServer())
+      .get('/')
+      .set('Cookie', flash as string)
+      .expect(200);
+    expect(page.text).toContain('Produto indisponível');
   });
 });
